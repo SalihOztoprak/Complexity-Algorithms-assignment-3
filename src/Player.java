@@ -1,4 +1,14 @@
 public class Player {
-    private int currentPosition;
-    private Color currentColor;
+    private Node currentNode;
+    private int playerNumber;
+    private String playerName;
+
+    public Player(int playerNumber, String playerName, Node currentNode) {
+        this.currentNode = currentNode;
+        this.playerNumber = playerNumber;
+        this.playerName = playerName;
+    }
+
+
+
 }
