@@ -29,12 +29,12 @@ public class Maze {
                 for (String edgeString : edgeStrings) {
                     String[] edgeParts = edgeString.split("-");
                     int destination = Integer.parseInt(edgeParts[1]);
-                    edges.add(new Node(edgeParts[0], destination));
+//                    edges.add(new Node(edgeParts[0], destination));
                 }
 
-                nodes.add(new Node(stringParts[0], edges));
+//                nodes.add(new Node(stringParts[0], edges));
             }
-            nodes.add(new Node("blue", null));
+//            nodes.add(new Node("blue", null));
         } catch (IOException e) {
             e.printStackTrace();
         }
