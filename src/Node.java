@@ -11,6 +11,13 @@ public class Node {
         this.neighbours = neighbours;
     }
 
+    public Node(String nodeString, ArrayList<Neighbour> neighbours) {
+        String[] splitString = nodeString.split("-");
+        this.color = Color.valueOf(splitString[0].toUpperCase());
+        this.number = Integer.valueOf(splitString[1]);
+        this.neighbours = neighbours;
+    }
+
     public int getNumber() {
         return number;
     }

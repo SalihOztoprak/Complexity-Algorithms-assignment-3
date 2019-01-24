@@ -2,12 +2,17 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Maze {
     private ArrayList<Node> nodes;
     private Player player1;
     private Player player2;
     private boolean isFinished;
+
+    public static void main(String[] args) {
+        new Maze().fileRead();
+    }
 
     public Maze() {
         nodes = fileRead();
@@ -17,11 +22,11 @@ public class Maze {
     }
 
     public void start() {
-        while (!isFinished){
+        while (!isFinished) {
             Color otherPlayersColor = player2.getCurrentNode().getColor();
             ArrayList<Neighbour> currentPlayersNeighbours = player1.getCurrentNode().getNeighbours();
             for (int i = 0; i < currentPlayersNeighbours.size(); i++) {
-                if (currentPlayersNeighbours.get(i).getPathway().equals(otherPlayersColor)){
+                if (currentPlayersNeighbours.get(i).getPathway().equals(otherPlayersColor)) {
 
                 }
             }
@@ -29,26 +34,33 @@ public class Maze {
     }
 
     private ArrayList<Node> fileRead() {
+        ArrayList<Node> nodes = new ArrayList<>();
+        ArrayList<Neighbour> neighbours;
         try (BufferedReader br = new BufferedReader(new FileReader("mazeStructure.txt"))) {
             String line;
-            while ((line = br.readLine()) != null) {
-                String[] stringParts = line.split(";");
-                String[] edgeStrings = stringParts[1].split(",");
-                ArrayList<Node> edges = new ArrayList<>();
+            String[] splitNode;
+            String[] splitNeighbours;
 
-                for (String edgeString : edgeStrings) {
-                    String[] edgeParts = edgeString.split("-");
-                    int destination = Integer.parseInt(edgeParts[1]);
-//                    edges.add(new Node(edgeParts[0], destination));
+            while ((line = br.readLine()) != null) {
+                neighbours = new ArrayList<>();
+                splitNode = line.split(";");
+
+                if (splitNode.length > 1) {
+                    splitNeighbours = splitNode[1].split(",");
+
+                    for (String splitNeighbour : splitNeighbours) {
+                        Neighbour neighbour = new Neighbour(splitNeighbour);
+                        neighbours.add(neighbour);
+                    }
                 }
 
-//                nodes.add(new Node(stringParts[0], edges));
+                Node node = new Node(splitNode[0],neighbours);
+                nodes.add(node);
             }
-//            nodes.add(new Node("blue", null));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return new ArrayList<>();
+        return nodes;
     }
 }
