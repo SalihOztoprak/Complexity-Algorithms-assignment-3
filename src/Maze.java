@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Maze {
@@ -25,7 +28,26 @@ public class Maze {
         }
     }
 
-    private ArrayList<Node> fileRead(){
+    private ArrayList<Node> fileRead() {
+        try (BufferedReader br = new BufferedReader(new FileReader("mazeStructure.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] stringParts = line.split(";");
+                String[] edgeStrings = stringParts[1].split(",");
+                ArrayList<Node> edges = new ArrayList<>();
+
+                for (String edgeString : edgeStrings) {
+                    String[] edgeParts = edgeString.split("-");
+                    int destination = Integer.parseInt(edgeParts[1]);
+//                    edges.add(new Node(edgeParts[0], destination));
+                }
+
+//                nodes.add(new Node(stringParts[0], edges));
+            }
+//            nodes.add(new Node("blue", null));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return new ArrayList<>();
     }
