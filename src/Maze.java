@@ -2,32 +2,77 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Maze {
     private ArrayList<Node> nodes;
-    private Player player1;
-    private Player player2;
+    private ArrayList<Move> moves;
+    private Player currentPlayer;
+    private Player otherPlayer;
     private boolean isFinished;
-
-    public static void main(String[] args) {
-        new Maze().fileRead();
-    }
 
     public Maze() {
         nodes = fileRead();
-        player1 = new Player(1, "Player 1", nodes.get(0));
-        player2 = new Player(2, "Player 2", nodes.get(1));
+        moves = new ArrayList<>();
+        Player player1 = new Player(1, "Player 1", nodes.get(0));
+        Player player2 = new Player(2, "Player 2", nodes.get(1));
+        currentPlayer = player1;
+        otherPlayer = player2;
         isFinished = false;
     }
 
     public void start() {
         while (!isFinished) {
-            Color otherPlayersColor = player2.getCurrentNode().getColor();
-            ArrayList<Neighbour> currentPlayersNeighbours = player1.getCurrentNode().getNeighbours();
-            for (int i = 0; i < currentPlayersNeighbours.size(); i++) {
-                if (currentPlayersNeighbours.get(i).getPathway().equals(otherPlayersColor)) {
+            nextRound();
+        }
+        System.out.println("Game is finished, the winner is " + currentPlayer.getName());
+    }
 
+    private void nextRound() {
+        //First get the color of the other player
+        Color otherPlayersColor = otherPlayer.getCurrentNode().getColor();
+
+        //Then we check if the current player has neighbours
+        ArrayList<Neighbour> currentPlayersNeighbours = currentPlayer.getCurrentNode().getNeighbours();
+        boolean switchSides = true;
+
+        //Loop through the neighbours to find one with the same color
+        for (Neighbour currentPlayersNeighbour : currentPlayersNeighbours) {
+            //If there is a match, follow the color
+            if (currentPlayersNeighbour.getPathway().equals(otherPlayersColor)) {
+                //Add the movement to the stack
+                moves.add(new Move(currentPlayer, currentPlayer.getCurrentNode(), currentPlayersNeighbour.getNumber()));
+                currentPlayer.setCurrentNode(nodes.get(currentPlayersNeighbour.getNumber() - 1));
+                currentPlayer.setSecondStepForPlayer(true);
+                switchSides = false;
+
+                System.out.println(currentPlayer.getName() + " goes to " + currentPlayer.getCurrentNode().getNumber());
+
+                //If the current player is now on the finish, stop the game
+                if (currentPlayer.getCurrentNode().getColor().equals(Color.BLUE)) {
+                    isFinished = true;
+                    break;
+                }
+            }
+        }
+
+        //First we have to check if we already did a movement before we swap
+        if (switchSides) {
+            if (currentPlayer.getSecondStepForPlayer()) {
+                Player tempPlayer = currentPlayer;
+                currentPlayer = otherPlayer;
+                otherPlayer = tempPlayer;
+                currentPlayer.setSecondStepForPlayer(false);
+                otherPlayer.setSecondStepForPlayer(false);
+            } else {
+                //The current player may take a step back
+                for (Move move1 : moves) {
+                    if (move1.getDestination() == currentPlayer.getCurrentNode().getNumber() && move1.getPlayer() == currentPlayer){
+                        currentPlayer.setCurrentNode(move1.getOrigin());
+                        currentPlayer.setSecondStepForPlayer(true);
+                        moves.remove(move1);
+                        System.out.println(currentPlayer.getName() + " went back to " + currentPlayer.getCurrentNode().getNumber());
+                        break;
+                    }
                 }
             }
         }
@@ -54,7 +99,7 @@ public class Maze {
                     }
                 }
 
-                Node node = new Node(splitNode[0],neighbours);
+                Node node = new Node(splitNode[0], neighbours);
                 nodes.add(node);
             }
         } catch (IOException e) {
