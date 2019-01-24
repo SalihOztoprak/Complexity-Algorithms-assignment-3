@@ -1,3 +1,3 @@
 public enum Color {
-    PURPLE, GREEN, BLACK, ORANGE
+    PURPLE, GREEN, BLACK, ORANGE, BLUE
 }

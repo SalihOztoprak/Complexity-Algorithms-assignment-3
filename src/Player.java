@@ -1,14 +1,23 @@
 public class Player {
+    private int number;
+    private String name;
     private Node currentNode;
-    private int playerNumber;
-    private String playerName;
 
-    public Player(int playerNumber, String playerName, Node currentNode) {
+    public Player(int number, String name, Node currentNode) {
+        this.number = number;
+        this.name = name;
         this.currentNode = currentNode;
-        this.playerNumber = playerNumber;
-        this.playerName = playerName;
     }
 
+    public int getNumber() {
+        return number;
+    }
 
+    public String getName() {
+        return name;
+    }
 
+    public Node getCurrentNode() {
+        return currentNode;
+    }
 }
