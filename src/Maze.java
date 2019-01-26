@@ -24,58 +24,101 @@ public class Maze {
         while (!isFinished) {
             nextRound();
         }
-        System.out.println("Game is finished, the winner is " + currentPlayer.getName());
     }
 
     private void nextRound() {
-        //First get the color of the other player
-        Color otherPlayersColor = otherPlayer.getCurrentNode().getColor();
+        Neighbour neighbour = checkForNeighbour();
 
-        //Then we check if the current player has neighbours
-        ArrayList<Neighbour> currentPlayersNeighbours = currentPlayer.getCurrentNode().getNeighbours();
-        boolean switchSides = true;
+        //If we found a neighbour, go to it
+        if (neighbour != null) {
+            movePlayer(neighbour);
 
-        //Loop through the neighbours to find one with the same color
-        for (Neighbour currentPlayersNeighbour : currentPlayersNeighbours) {
+            System.out.println(currentPlayer.getName() + " goes to " + currentPlayer.getCurrentNode().getNumber());
+
+            //If the current player is now on the finish, stop the game
+            if (currentPlayer.getCurrentNode().getColor().equals(Color.BLUE)) {
+                System.out.println(currentPlayer.getName() + " has finished the maze");
+                isFinished = true;
+            }
+
+            otherPlayer.setSwitchedBefore(false);
+            currentPlayer.setSwitchedBefore(false);
+        }
+
+        //If we didn't found a neighbour, try to switch places
+        else if (!otherPlayer.getSwitchedBefore()) {
+            otherPlayer.setSwitchedBefore(true);
+            switchSides();
+        }
+
+        //If we already switched places try to backtrack
+        else {
+            currentPlayer.setSwitchedBefore(false);
+            currentPlayer.setSecondStepForPlayer(false);
+            backtrack();
+        }
+    }
+
+    private Neighbour checkForNeighbour() {
+        //Create a boolean that checks if we followed a path before
+        boolean followedBefore = false;
+
+        //Loop through the neighbours to find one with the same path color of the other player
+        for (Neighbour neighbour : currentPlayer.getCurrentNode().getNeighbours()) {
             //If there is a match, follow the color
-            if (currentPlayersNeighbour.getPathway().equals(otherPlayersColor)) {
-                //Add the movement to the stack
-                moves.add(new Move(currentPlayer, currentPlayer.getCurrentNode(), currentPlayersNeighbour.getNumber()));
-                currentPlayer.setCurrentNode(nodes.get(currentPlayersNeighbour.getNumber() - 1));
-                currentPlayer.setSecondStepForPlayer(true);
-                switchSides = false;
+            if (neighbour.getPathway().equals(otherPlayer.getCurrentNode().getColor())) {
+                //Check if we followed that path before
+                for (Move move : moves) {
+                    if (move.getOrigin().equals(currentPlayer.getCurrentNode()) && move.getDestination() == neighbour.getNumber() && move.wentBackBefore()) {
+                        //We followed this path before, so we don't follow it again
+                        followedBefore = true;
+                        break;
+                    }
+                }
 
-                System.out.println(currentPlayer.getName() + " goes to " + currentPlayer.getCurrentNode().getNumber());
+                //We end up here if we didn't follow this path before
+                if (!followedBefore) {
+                    return neighbour;
+                }
+            }
+        }
+        return null;
+    }
 
-                //If the current player is now on the finish, stop the game
-                if (currentPlayer.getCurrentNode().getColor().equals(Color.BLUE)) {
-                    isFinished = true;
+    private void movePlayer(Neighbour neighbour) {
+        moves.add(new Move(currentPlayer, currentPlayer.getCurrentNode(), neighbour.getNumber(), otherPlayer.getCurrentNode().getColor()));
+        currentPlayer.setCurrentNode(nodes.get(neighbour.getNumber() - 1));
+        currentPlayer.setSecondStepForPlayer(true);
+    }
+
+    private void backtrack() {
+        //If we already did a second check, switch players
+        if (currentPlayer.getSecondStepForPlayer()) {
+            switchSides();
+        }
+
+        //If we didn't do a second step, try to go back a step
+        else {
+            //Find a move with your destination and that isn't used before to backtrack
+            for (Move move : moves) {
+                //If we find a move that matches, we go back to that move
+                if (move.getDestination() == currentPlayer.getCurrentNode().getNumber() && move.getPlayer() == currentPlayer && !move.wentBackBefore()) {
+                    move.setWentBack(true);
+                    currentPlayer.setCurrentNode(move.getOrigin());
+                    currentPlayer.setSecondStepForPlayer(true);
+                    System.out.println(currentPlayer.getName() + " went back to " + currentPlayer.getCurrentNode().getNumber());
+                    switchSides();
                     break;
                 }
             }
         }
+    }
 
-        //First we have to check if we already did a movement before we swap
-        if (switchSides) {
-            if (currentPlayer.getSecondStepForPlayer()) {
-                Player tempPlayer = currentPlayer;
-                currentPlayer = otherPlayer;
-                otherPlayer = tempPlayer;
-                currentPlayer.setSecondStepForPlayer(false);
-                otherPlayer.setSecondStepForPlayer(false);
-            } else {
-                //The current player may take a step back
-                for (Move move1 : moves) {
-                    if (move1.getDestination() == currentPlayer.getCurrentNode().getNumber() && move1.getPlayer() == currentPlayer){
-                        currentPlayer.setCurrentNode(move1.getOrigin());
-                        currentPlayer.setSecondStepForPlayer(true);
-                        moves.remove(move1);
-                        System.out.println(currentPlayer.getName() + " went back to " + currentPlayer.getCurrentNode().getNumber());
-                        break;
-                    }
-                }
-            }
-        }
+    private void switchSides() {
+        System.out.println(currentPlayer.getName() + " couldn't do a move, switching with my partner");
+        Player tempPlayer = currentPlayer;
+        currentPlayer = otherPlayer;
+        otherPlayer = tempPlayer;
     }
 
     private ArrayList<Node> fileRead() {

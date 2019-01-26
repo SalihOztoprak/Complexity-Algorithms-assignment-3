@@ -3,11 +3,13 @@ public class Player {
     private String name;
     private Node currentNode;
     private boolean secondStepForPlayer;
+    private boolean switchedBefore;
 
     public Player(int number, String name, Node currentNode) {
         this.number = number;
         this.name = name;
         this.currentNode = currentNode;
+        this.switchedBefore = false;
         this.secondStepForPlayer = false;
     }
 
@@ -33,5 +35,13 @@ public class Player {
 
     public void setCurrentNode(Node currentNode) {
         this.currentNode = currentNode;
+    }
+
+    public boolean getSwitchedBefore() {
+        return switchedBefore;
+    }
+
+    public void setSwitchedBefore(boolean switchedBefore) {
+        this.switchedBefore = switchedBefore;
     }
 }
