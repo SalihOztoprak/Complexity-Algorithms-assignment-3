@@ -3,6 +3,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * This class is used to define a maze
+ * It contains methods to find a path through the given maze
+ */
 public class Maze {
     private ArrayList<Node> nodes;
     private ArrayList<Move> moves;
@@ -10,22 +14,32 @@ public class Maze {
     private Player otherPlayer;
     private boolean isFinished;
 
+    /**
+     * This is the default constructor for creating a maze
+     */
     public Maze() {
         nodes = fileRead();
         moves = new ArrayList<>();
-        Player player1 = new Player(1, "Player 1", nodes.get(0));
-        Player player2 = new Player(2, "Player 2", nodes.get(1));
+        Player player1 = new Player("Player 1", nodes.get(0));
+        Player player2 = new Player("Player 2", nodes.get(1));
         currentPlayer = player1;
         otherPlayer = player2;
         isFinished = false;
     }
 
+    /**
+     * This method starts the maze
+     */
     public void start() {
         while (!isFinished) {
             nextRound();
         }
     }
 
+    /**
+     * This method creates a new round for a player
+     * A round will look for possibilities for the current user
+     */
     private void nextRound() {
         Neighbour neighbour = checkForNeighbour();
 
@@ -59,6 +73,12 @@ public class Maze {
         }
     }
 
+    /**
+     * This method checks if the currentnode has neighbours which he can follow
+     * When there is no neighbour left, it returns null
+     *
+     * @return The neighbour that has to be followed
+     */
     private Neighbour checkForNeighbour() {
         //Create a boolean that checks if we followed a path before
         boolean followedBefore = false;
@@ -85,12 +105,21 @@ public class Maze {
         return null;
     }
 
+    /**
+     * This method moves a player to the neighbour and saves it in a list of moves
+     *
+     * @param neighbour The neighbour you want to go to
+     */
     private void movePlayer(Neighbour neighbour) {
-        moves.add(new Move(currentPlayer, currentPlayer.getCurrentNode(), neighbour.getNumber(), otherPlayer.getCurrentNode().getColor()));
+        moves.add(new Move(currentPlayer, currentPlayer.getCurrentNode(), neighbour.getNumber()));
         currentPlayer.setCurrentNode(nodes.get(neighbour.getNumber() - 1));
         currentPlayer.setSecondStepForPlayer(true);
     }
 
+    /**
+     * This method let's the player backtrack in the maze
+     * The method will be called when there are no options left for both players
+     */
     private void backtrack() {
         //If we already did a second check, switch players
         if (currentPlayer.getSecondStepForPlayer()) {
@@ -114,6 +143,9 @@ public class Maze {
         }
     }
 
+    /**
+     * This method let's the players switch sides
+     */
     private void switchSides() {
         System.out.println(currentPlayer.getName() + " couldn't do a move, switching with my partner");
         Player tempPlayer = currentPlayer;
@@ -121,6 +153,11 @@ public class Maze {
         otherPlayer = tempPlayer;
     }
 
+    /**
+     * This method reads the mazeStructure.txt file and converts it to an ArrayList
+     *
+     * @return The ArrayList containing the data of the file
+     */
     private ArrayList<Node> fileRead() {
         ArrayList<Node> nodes = new ArrayList<>();
         ArrayList<Neighbour> neighbours;

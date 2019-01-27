@@ -1,15 +1,23 @@
+/**
+ * This class defines a move in the maze
+ */
 public class Move {
     private Player player;
     private Node origin;
     private int destination;
-    private Color otherPlayersColor;
     private boolean wentBack;
 
-    public Move(Player player, Node origin, int destination, Color otherPlayersColor) {
+    /**
+     * This is the default constructor for a move
+     *
+     * @param player      The player that makes the move
+     * @param origin      The node where you came from
+     * @param destination The number of the node you are going to
+     */
+    public Move(Player player, Node origin, int destination) {
         this.player = player;
         this.origin = origin;
         this.destination = destination;
-        this.otherPlayersColor = otherPlayersColor;
         this.wentBack = false;
     }
 
